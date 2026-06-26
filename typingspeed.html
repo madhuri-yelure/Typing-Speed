@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Typing Speed Test</title>
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body{
+      background:#f4f4f4;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+
+    .container{
+      width:700px;
+      background:white;
+      padding:30px;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.2);
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:20px;
+      color:#333;
+    }
+
+    .quote{
+      font-size:20px;
+      margin-bottom:20px;
+      line-height:1.6;
+      color:#444;
+    }
+
+    textarea{
+      width:100%;
+      height:120px;
+      padding:10px;
+      font-size:18px;
+      border:2px solid #ccc;
+      border-radius:8px;
+      resize:none;
+      outline:none;
+    }
+
+    .info{
+      display:flex;
+      justify-content:space-between;
+      margin-top:20px;
+      font-size:18px;
+    }
+
+    button{
+      margin-top:20px;
+      width:100%;
+      padding:12px;
+      background:#007bff;
+      color:white;
+      border:none;
+      border-radius:8px;
+      font-size:18px;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:#0056b3;
+    }
+
+    .correct{
+      color:green;
+    }
+
+    .wrong{
+      color:red;
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>Typing Speed Test</h1>
+
+    <p class="quote" id="quote"></p>
+
+    <textarea 
+      id="input"
+      placeholder="Start typing here..."
+    ></textarea>
+
+    <div class="info">
+      <p>Time: <span id="time">60</span>s</p>
+      <p>WPM: <span id="wpm">0</span></p>
+      <p>Accuracy: <span id="accuracy">0</span>%</p>
+    </div>
+
+    <button onclick="restartTest()">Restart Test</button>
+
+  </div>
+
+<script>
+
+const quotes = [
+  "JavaScript is the language of the web.",
+  "Practice makes a person perfect.",
+  "Frontend development is fun and creative.",
+  "Coding improves problem solving skills.",
+  "Consistency is the key to success."
+];
+
+const quoteElement = document.getElementById("quote");
+const inputElement = document.getElementById("input");
+const timeElement = document.getElementById("time");
+const wpmElement = document.getElementById("wpm");
+const accuracyElement = document.getElementById("accuracy");
+
+let currentQuote = "";
+let timer = 60;
+let interval;
+let started = false;
+
+function loadQuote() {
+  currentQuote = quotes[Math.floor(Math.random() * quotes.length)];
+  quoteElement.innerHTML = currentQuote;
+}
+
+loadQuote();
+
+inputElement.addEventListener("input", () => {
+
+  if (!started) {
+    startTimer();
+    started = true;
+  }
+
+  const typedText = inputElement.value;
+
+  let correctChars = 0;
+
+  let displayedText = currentQuote.split("").map((char, index) => {
+
+    if (typedText[index] == null) {
+      return `<span>${char}</span>`;
+    }
+
+    if (typedText[index] === char) {
+      correctChars++;
+      return `<span class="correct">${char}</span>`;
+    } else {
+      return `<span class="wrong">${char}</span>`;
+    }
+
+  }).join("");
+
+  quoteElement.innerHTML = displayedText;
+
+  // Accuracy
+  let accuracy = Math.floor((correctChars / typedText.length) * 100);
+
+  if (!accuracy || accuracy < 0) {
+    accuracy = 0;
+  }
+
+  accuracyElement.innerText = accuracy;
+
+  // WPM
+  let words = typedText.trim().split(" ").length;
+
+  let wpm = Math.floor((words / (60 - timer + 1)) * 60);
+
+  if (!wpm || wpm < 0) {
+    wpm = 0;
+  }
+
+  wpmElement.innerText = wpm;
+
+});
+
+function startTimer() {
+
+  interval = setInterval(() => {
+
+    timer--;
+    timeElement.innerText = timer;
+
+    if (timer === 0) {
+      clearInterval(interval);
+      inputElement.disabled = true;
+      alert("Time's Up!");
+    }
+
+  }, 1000);
+
+}
+
+function restartTest() {
+
+  clearInterval(interval);
+
+  timer = 60;
+  started = false;
+
+  timeElement.innerText = timer;
+  wpmElement.innerText = 0;
+  accuracyElement.innerText = 0;
+
+  inputElement.value = "";
+  inputElement.disabled = false;
+
+  loadQuote();
+
+}
+
+</script>
+
+</body>
+</html>
